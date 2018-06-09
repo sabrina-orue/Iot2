@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Iot2</string>
+    <string name="tituloControlTemperatura">
+        Considere una temperatura mínima y una máxima para el control automático del Calentador de Ambientes
+    </string>
 </resources>

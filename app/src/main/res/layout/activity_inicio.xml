@@ -15,7 +15,7 @@ android:orientation="vertical" android:layout_width="match_parent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Considere una temperatura máxima y minima en ºC indispensables para el encendido y apagado del Calentador de Ambientes"
+            android:text="@string/tituloControlTemperatura"
             android:textAlignment="viewStart"
             android:textStyle="italic" />
     </LinearLayout>
@@ -49,7 +49,7 @@ android:orientation="vertical" android:layout_width="match_parent"
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/editText2"
+                android:id="@+id/tempMinima"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -81,7 +81,7 @@ android:orientation="vertical" android:layout_width="match_parent"
             android:orientation="vertical">
 
             <EditText
-                android:id="@+id/editText4"
+                android:id="@+id/tempMaxima"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -165,7 +165,7 @@ android:orientation="vertical" android:layout_width="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <EditText
+                <TextView
                     android:id="@+id/idTemperatura"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
