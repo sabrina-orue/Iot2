@@ -17,7 +17,7 @@ public class MainControles extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_controles);
-        controlTemperatura = findViewById(R.id.ButtonTemperatura);
+        controlTemperatura = (Button)findViewById(R.id.ButtonTemperatura);
         controlTemperatura.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

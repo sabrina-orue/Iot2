@@ -37,9 +37,10 @@ public class MainInicialiceActivity extends AppCompatActivity {
     EditText minParam;
     EditText maxParam;
 
-    public final String API = "http://192.168.0.20:8080/apiInformacion";
+    public final String API = "http://192.168.0.32:8080/apiInformacion";
 
     private static boolean cambioParametro;
+    private static boolean isModalVisible;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,25 +48,13 @@ public class MainInicialiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_inicio);
 
         cambioParametro = false;
+        isModalVisible = false;
 
-        estadoSwitch = findViewById(R.id.Switch);
+        estadoSwitch = (Switch) findViewById(R.id.Switch);
         estadoSwitch.setClickable(false);
 
         minParam = (EditText)findViewById(R.id.tempMinima);
         maxParam = (EditText)findViewById(R.id.tempMaxima);
-        TextWatcher watcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-            @Override
-            public void afterTextChanged(Editable s) {
-                cambioParametro = true;
-            }
-        };
-
-        minParam.addTextChangedListener(watcher);
-        maxParam.addTextChangedListener(watcher);
 
         temperatura = (TextView) findViewById(R.id.idTemperatura);
         GetTemperaturaThread time = new GetTemperaturaThread();
@@ -93,29 +82,30 @@ public class MainInicialiceActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String tempActual) {
-            TextView tempActualTextView = (TextView) findViewById(R.id.idTemperatura);
-            tempActualTextView.setText(tempActual);
-            if(cambioParametro) {
+            if(!isModalVisible) {
+                TextView tempActualTextView = (TextView) findViewById(R.id.idTemperatura);
+                tempActualTextView.setText(tempActual);
                 try {
                     Float temp = Float.parseFloat(tempActual);
                     String minInput = ((EditText) findViewById(R.id.tempMinima)).getText().toString();
                     String maxInput = ((EditText) findViewById(R.id.tempMaxima)).getText().toString();
 
-                    //pongo en null las temperaturas cuando no ingresa nada para que no lanze el NumberFormatException
-                    Float tempMinima = !"".equals(minInput) ? Float.valueOf(minInput) : null;
-                    Float tempMaxima = !"".equals(maxInput) ? Float.valueOf(maxInput) : null;
+                    //pongo en número irrealista las temperaturas cuando no ingresa nada para que no lanze el NumberFormatException
+                    Float tempMinima = !"".equals(minInput) ? Float.parseFloat(minInput) : -9999;
+                    Float tempMaxima = !"".equals(maxInput) ? Float.parseFloat(maxInput) : 9999;
                     Boolean estaPrendidoCalefactor = ((Switch) findViewById(R.id.Switch)).isChecked();
-                    if(tempMinima>tempMinima){
+
+                    if (tempMinima > tempMaxima) {
                         throw new InvalidParameterException("Los parámetros deben ser coherentes");
                     }
-                    if (!estaPrendidoCalefactor && tempMinima != null && temp < tempMinima) {
+                    if (!estaPrendidoCalefactor && temp < tempMinima) {
                         ControlNotificacion(
                                 "Desea prender la estufa?",
                                 "/encenderCalentador",
                                 "Hace menos de " + tempMinima + " ºC"
                         );
                     }
-                    if (estaPrendidoCalefactor && tempMaxima != null && temp > tempMaxima) {
+                    if (estaPrendidoCalefactor && temp > tempMaxima) {
                         ControlNotificacion(
                                 "Desea apagar la estufa?",
                                 "/apagarCalentador",
@@ -125,11 +115,9 @@ public class MainInicialiceActivity extends AppCompatActivity {
                 } catch (NumberFormatException e) {
                     e.printStackTrace();
                     Toast.makeText(getApplicationContext(), "Los parámetros deben ser numéricos", Toast.LENGTH_LONG).show();
-                } catch (InvalidParameterException e){
+                } catch (InvalidParameterException e) {
                     Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                 }
-                cambioParametro = false;
-                //   Toast.makeText(MainActivity.this,"cada 5 segundos",Toast.LENGTH_SHORT).show();
             }
             GetTemperaturaThread nuevoThread = new GetTemperaturaThread();
             nuevoThread.execute();
@@ -155,6 +143,8 @@ public class MainInicialiceActivity extends AppCompatActivity {
                     estadoSwitch.setChecked(respuesta.getBoolean("estadoCalentador"));
                 }catch(JSONException e){
                     e.printStackTrace();
+                }finally {
+                    isModalVisible = false;
                 }
             }
         });
@@ -163,11 +153,13 @@ public class MainInicialiceActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+                isModalVisible = false;
             }
         });
         AlertDialog titulo = alert.create();
         titulo.setTitle(tituloModal);
         titulo.show();
+        isModalVisible = true;
 
     }
 }
