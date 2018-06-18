@@ -2,6 +2,8 @@ package com.example.algeiba.iot2.UtilidadesBD;
 
 import android.content.ContentValues;
 
+import com.example.algeiba.iot2.SeguridadUtil;
+
 /**
  * Created by Algeiba on 5/26/2018.
  */
@@ -21,18 +23,38 @@ public class UtilidadUsuario {
             Campo_Nombre+"  varchar not null,"+
             Campo_Password+"  varchar not null," +
             Campo_Intentos+" integer not null)";
-    public UtilidadUsuario(){
 
+    public static ContentValues usuario;
+
+    private static UtilidadUsuario instancia;
+
+
+    public static synchronized UtilidadUsuario getInstancia(){
+        if(instancia == null){
+            instancia = new UtilidadUsuario();
+        }
+        return instancia;
     }
-    public ContentValues valueUsuario(String email, String nombre, String password){
-        ContentValues usuario= new ContentValues();
-        usuario.put(Campo_Email,email);
-        usuario.put(Campo_Nombre,nombre);
-        usuario.put(Campo_Password,password);
+
+    private UtilidadUsuario(){
+    }
+    public ContentValues valueUsuario(String email, String nombre, String password)
+    throws  Exception{
+        usuario = new ContentValues();
+
+        String passwdEncp = SeguridadUtil.encrypt(password,SeguridadUtil.PALABRACLAVE);
+        String emailEncp = SeguridadUtil.encrypt(email,passwdEncp);
+        String nombreEncp = SeguridadUtil.encrypt(nombre,passwdEncp);
+        usuario.put(Campo_Email,emailEncp);
+        usuario.put(Campo_Nombre,nombreEncp);
+        usuario.put(Campo_Password,passwdEncp);
 
         return usuario;
     }
-public String insertUsuario(String nombre, String email, String password){
+public String insertUsuario(){
+    String email = usuario.get(Campo_Email).toString();
+    String nombre = usuario.get(Campo_Nombre).toString();
+    String password = usuario.get(Campo_Password).toString();
     String insert = "INSERT INTO "+Tabla_Usuario+"("+Campo_Email+","+Campo_Nombre+","+Campo_Password+","+Campo_Intentos+") VALUES ('"+email+"','"+nombre+"','"+password+"',0)";
 return insert;
 }

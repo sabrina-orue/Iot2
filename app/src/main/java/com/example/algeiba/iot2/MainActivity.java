@@ -1,5 +1,6 @@
 package com.example.algeiba.iot2;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void Validaciones( String email,String pass) {
-        UtilidadUsuario value = new UtilidadUsuario();
+        UtilidadUsuario value = UtilidadUsuario.getInstancia();
         String consulta = value.consultaUsuarioCompleto(email);
         ConexionSqliteHelper conexion=new ConexionSqliteHelper(this);
         SQLiteDatabase DB = conexion.getWritableDatabase();
@@ -98,26 +99,39 @@ public class MainActivity extends AppCompatActivity {
 
         //valido si existe el usuario y si coincide la contraseña/
         if(cursor.moveToFirst()){
-            String password = cursor.getString(cursor.getColumnIndex("password"));
-            String name = cursor.getString(cursor.getColumnIndex("nombre"));
-            int x = cursor.getInt(cursor.getColumnIndex("intentos"));
-            Usuario usuario = new Usuario(name,email,password);
-            if (pass.equals(password)){
-                SharedPreferences preferencias = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferencias.edit();
-                editor.putString("name",usuario.getUsuario());
-                editor.putString("pass",usuario.getPassword());
-                editor.putString("email",usuario.getEmail());
-                editor.putBoolean("IsLogin",true);
-                editor.commit();//confirma los datos almacenados
+            try {
+                String passwdEncrip = cursor.getString(cursor.getColumnIndex("password"));
+                String nombreEncrip = cursor.getString(cursor.getColumnIndex("nombre"));
 
-                //String N = preferencias.getString("name", null);
-                //String P= preferencias.getString("email",null);
-                //String P= preferencias.getString("pass",null);
-                Toast.makeText(getApplicationContext(), "Ingreso exitoso",Toast.LENGTH_SHORT).show();
-                Intent buton = new Intent(MainActivity.this, MainControles.class);
-                startActivity(buton);
+                //la password fue encriptada con palabra clave
+                String password = SeguridadUtil.decrypt(passwdEncrip, SeguridadUtil.PALABRACLAVE);
+
+                //todos los campos fueron encriptados con la password sin encriptar
+                String name = SeguridadUtil.decrypt(nombreEncrip, passwdEncrip);
+                int x = cursor.getInt(cursor.getColumnIndex("intentos"));
+                if (pass.equals(password)){
+                    SharedPreferences preferencias = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferencias.edit();
+                    //Refactor para que guarde encriptado
+                    //FIXME: ver como mejorar el código haciendo que se guarde estáticamente el usuario sin llamar a valueUsuario
+                    value.valueUsuario(name,email,password);
+                    editor.putString("name",value.usuario.get(value.Campo_Email).toString());
+                    editor.putString("pass",value.usuario.get(value.Campo_Nombre).toString());
+                    editor.putString("email",value.usuario.get(value.Campo_Password).toString());
+                    editor.putBoolean("IsLogin",true);
+                    editor.commit();//confirma los datos almacenados
+
+                    //String N = preferencias.getString("name", null);
+                    //String P= preferencias.getString("email",null);
+                    //String P= preferencias.getString("pass",null);
+                    Toast.makeText(getApplicationContext(), "Ingreso exitoso",Toast.LENGTH_SHORT).show();
+                    Intent buton = new Intent(MainActivity.this, MainControles.class);
+                    startActivity(buton);
+                }
+            }catch(Exception e){
+                e.printStackTrace();
             }
+
            // else {
             //    Toast.makeText(getApplicationContext(), "Datos incorrectos", Toast.LENGTH_SHORT).show();
              //   x = x + 1;

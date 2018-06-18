@@ -24,7 +24,7 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
 
         public Button botonOkRegistro;
         public EditText nombreUsuario,emailUsuario,passwordUsuario;
-        public UtilidadUsuario value= new UtilidadUsuario();
+        public UtilidadUsuario value= UtilidadUsuario.getInstancia();
         public int intentos = 0;
 
         @Override
@@ -43,6 +43,9 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
             if ((nombreUsuario.length() == 0) || (emailUsuario.length() == 0) || (passwordUsuario.length() == 0)) {
                 Toast.makeText(getApplicationContext(),"Faltan Completar Campos", Toast.LENGTH_SHORT).show();
             }
+            else if(passwordUsuario.length() < 8 ){
+                Toast.makeText(getApplicationContext(),"Contraseña demasiado corta", Toast.LENGTH_SHORT).show();
+            }
             else {
                 Boolean correcto= Validacion(emailUsuario.getText().toString());
                 if (correcto){
@@ -55,7 +58,7 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
                 //registrarUsuariosPorSentencia();
             }
         }
-
+    //TODO: ver con Sabry
         private Boolean Validacion(String emailUser) {
             if (!Patterns.EMAIL_ADDRESS.matcher(emailUser).matches()) {
                 // String mensaje= String.valueOf(R.string.inalid);
@@ -70,7 +73,7 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
                 Cursor cursor = DB.rawQuery(consulta,null);
                 if (cursor.moveToFirst()){ //devuelve true si existe el registro
                     //si existe muestro una noti en el input
-                    String mensaje = String.valueOf("Datos Incorrectos");
+                    String mensaje = String.valueOf("El usuario ya existe");
                     emailUsuario.setError(mensaje);
                     return false;
                 }
@@ -83,27 +86,32 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
 
         public void registrarUsuarios() {
             ConexionSqliteHelper conexion=new ConexionSqliteHelper(this);
-            ContentValues user = value.valueUsuario(emailUsuario.getText().toString(),nombreUsuario.getText().toString(),passwordUsuario.getText().toString());
-            SQLiteDatabase DB= conexion.getWritableDatabase();
-            String insertUsuario= value.insertUsuario(emailUsuario.getText().toString(),nombreUsuario.getText().toString(),passwordUsuario.getText().toString());
-            DB.execSQL(insertUsuario);
-            //DB.insert(UtilidadUsuario.Tabla_Usuario,null,user);
-            DB.close();
-            SharedPreferences preferencias = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferencias.edit();
-            editor.putString("name",nombreUsuario.getText().toString());
-            editor.putString("pass",passwordUsuario.getText().toString());
-            editor.putString("email",emailUsuario.getText().toString());
-            editor.putBoolean("IsLogin",true);
-            editor.commit();
+            try {
+                ContentValues user = value.valueUsuario(emailUsuario.getText().toString(), nombreUsuario.getText().toString(), passwordUsuario.getText().toString());
+                SQLiteDatabase DB= conexion.getWritableDatabase();
 
-            Toast.makeText(getApplicationContext(),"Se ha regitrado correctamente",Toast.LENGTH_SHORT).show();
-            Intent buton = new Intent(MainRegistroActivity.this, MainControles.class);
-            startActivity(buton);
+                //inserta lo que haya en @ContentValues.usuario
+                String insertUsuario= value.insertUsuario();
+                DB.execSQL(insertUsuario);
+                DB.close();
+                SharedPreferences preferencias = getSharedPreferences("preferencias", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferencias.edit();
+                editor.putString("name",value.usuario.get(value.Campo_Email).toString());
+                editor.putString("pass",value.usuario.get(value.Campo_Nombre).toString());
+                editor.putString("email",value.usuario.get(value.Campo_Password).toString());
+                editor.putBoolean("IsLogin",true);
+                editor.commit();
 
-            //  Intent intent= new Intent(Main2Activity.this, MomentoListActivity.class);     //asocio la instancia de redireccion de la activity actual a la de register
-            // startActivity(intent);
+                Toast.makeText(getApplicationContext(),"Se ha regitrado correctamente",Toast.LENGTH_SHORT).show();
+                Intent buton = new Intent(MainRegistroActivity.this, MainControles.class);
+                startActivity(buton);
 
+                //  Intent intent= new Intent(Main2Activity.this, MomentoListActivity.class);     //asocio la instancia de redireccion de la activity actual a la de register
+                // startActivity(intent);
+            }catch(Exception e){
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(),"No se pudo registrar",Toast.LENGTH_LONG).show();
+            }
         }
 
     }
