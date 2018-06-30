@@ -40,11 +40,21 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
             emailUsuario = (EditText) findViewById(R.id.emailUser);
             passwordUsuario = (EditText) findViewById(R.id.passUser);
 
+            boolean robust = SeguridadUtil.RobustPassword(passwordUsuario.getText().toString());
+
+
             if ((nombreUsuario.length() == 0) || (emailUsuario.length() == 0) || (passwordUsuario.length() == 0)) {
                 Toast.makeText(getApplicationContext(),"Faltan Completar Campos", Toast.LENGTH_SHORT).show();
             }
             else if(passwordUsuario.length() < 8 ){
-                Toast.makeText(getApplicationContext(),"Contraseña demasiado corta", Toast.LENGTH_SHORT).show();
+                passwordUsuario.setError("Contraseña demasiado corta");
+
+              //  Toast.makeText(getApplicationContext(),"Contraseña demasiado corta", Toast.LENGTH_SHORT).show();
+            }
+            else if(robust != true) {
+                passwordUsuario.setError("La cotraseña debe contener Mayuscula, minuscula y numeros");
+              //  Toast.makeText(getApplicationContext(), "La cotraseña debe contener Mayuscula, minuscula y numeros", Toast.LENGTH_SHORT).show();
+
             }
             else {
                 Boolean correcto= Validacion(emailUsuario.getText().toString());
@@ -52,7 +62,8 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
                     registrarUsuarios();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),"No se ha podido registrar",Toast.LENGTH_SHORT).show();
+                    emailUsuario.setError("Tipo de mail Icorrecto");
+                    Toast.makeText(getApplicationContext(),"Tipo de mail Icorrecto",Toast.LENGTH_SHORT).show();
 
                 }
                 //registrarUsuariosPorSentencia();

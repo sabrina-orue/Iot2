@@ -37,7 +37,7 @@ public class MainInicialiceActivity extends AppCompatActivity {
     EditText minParam;
     EditText maxParam;
 
-    public final String API = "http://192.168.0.32:8080/apiInformacion";
+    public final String API = "http://192.168.0.104:8080/apiInformacion";
 
     private static boolean cambioParametro;
     private static boolean isModalVisible;

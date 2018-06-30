@@ -65,7 +65,7 @@ return insert;
     }
 
     public String consultaUsuarioCompleto(String user){
-        String consultaEmail= "select "+Campo_Email+", "+Campo_Password+", "+Campo_Nombre +", "+Campo_Intentos+" from "+Tabla_Usuario+" where "+Campo_Email+" == '"+user+"';";
+        String consultaEmail= "select "+Campo_Email+", "+Campo_Password+", "+Campo_Nombre +", "+Campo_Intentos+" from "+Tabla_Usuario+" where "+Campo_Email+" == '"+user+"'";
         return consultaEmail;
     }
 

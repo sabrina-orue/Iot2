@@ -2,6 +2,7 @@ package com.example.algeiba.iot2;
 
 import android.util.Base64;
 
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 
 import javax.crypto.Cipher;
@@ -15,6 +16,28 @@ public class SeguridadUtil
 {
     public final static String PALABRACLAVE = "encriptUnaj2018";
     public final static String ALGORITMO = "AES";
+
+    public static boolean RobustPassword(String str) {
+        char ch;
+        boolean capitalFlag = false;
+        boolean lowerCaseFlag = false;
+        boolean numberFlag = false;
+        for(int i=0;i < str.length();i++) {
+            ch = str.charAt(i);
+            if( Character.isDigit(ch)) {
+                numberFlag = true;
+            }
+            else if (Character.isUpperCase(ch)) {
+                capitalFlag = true;
+            }
+            else if (Character.isLowerCase(ch)) {
+                lowerCaseFlag = true;
+            }
+            if(numberFlag && capitalFlag && lowerCaseFlag)
+                return true;
+        }
+        return false;
+    }
 
     public static  SecretKeySpec generateKey(String password) throws  Exception {
         final MessageDigest digest= MessageDigest.getInstance("SHA-256");
@@ -37,10 +60,12 @@ public class SeguridadUtil
         SecretKeySpec key = generateKey(password);
         Cipher c = Cipher.getInstance(ALGORITMO);
         c.init(Cipher.DECRYPT_MODE, key);
-        byte[] decodeValue = Base64.decode(user, Base64.DEFAULT);
+        byte[] decodeValue = Base64.decode(user.getBytes(), Base64.DEFAULT);
         byte[] decValue = c.doFinal(decodeValue);
+        String plainText = new String(decValue, Charset.forName("UTF8"));
         String decryptedValue = new String(decValue);
-        return decryptedValue;
+
+        return plainText;
     }
 
 }

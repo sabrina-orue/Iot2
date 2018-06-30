@@ -124,7 +124,6 @@ android:orientation="vertical" android:layout_width="match_parent"
                     android:ems="10"
                     android:inputType="numberDecimal"
                     android:textAllCaps="false"
-                    android:text="2"
                     android:textSize="30dp"
                     android:textAlignment="center"/>
 
