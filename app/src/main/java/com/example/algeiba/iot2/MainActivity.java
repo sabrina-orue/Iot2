@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.util.Patterns;
 import android.widget.TextView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         //        }
         //       }
         // }
+
         botonRegistro = (Button) findViewById(R.id.btnRegistrate);
         botonRegistro.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
         botonSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                emailUsuario = (TextView) findViewById(R.id.nameUser);
                 passwordUsuario = (TextView) findViewById(R.id.passwordUser);
                 String Pass = null;
                 try {
@@ -99,7 +100,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 String name = null;
                 try {
+                    emailUsuario = (TextView) findViewById(R.id.nameUser);
+                    if(!Patterns.EMAIL_ADDRESS.matcher(emailUsuario.getText().toString()).matches()) {
+                        // String mensaje= String.valueOf(R.string.inalid);
+                        emailUsuario.setError("Email no valido");
+                    }
                     name = SeguridadUtil.encrypt(emailUsuario.getText().toString(),Pass);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -113,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void Validaciones( String email,String pass) {
 
+       // if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            // String mensaje= String.valueOf(R.string.inalid);
+          //  emailUsuario.setError("Email no valido");
+      //  }
         UtilidadUsuario value = UtilidadUsuario.getInstancia();
         String consulta = value.consultaUsuarioCompleto(email);
         ConexionSqliteHelper conexion=new ConexionSqliteHelper(this);
@@ -191,11 +202,11 @@ public class MainActivity extends AppCompatActivity {
         else{
             contador = contador+1;
             if (contador == 3){
-                emailUsuario.setFocusable(false);
+                //emailUsuario.setFocusable(false);
                 emailUsuario.setEnabled(false);
                 emailUsuario.setCursorVisible(false);
 
-                passwordUsuario.setFocusable(false);
+               //passwordUsuario.setFocusable(false);
                 passwordUsuario.setEnabled(false);
                 passwordUsuario.setCursorVisible(false);
 
@@ -251,11 +262,11 @@ public class MainActivity extends AppCompatActivity {
                 reintente2.setVisibility(View.INVISIBLE);
                 reintente.setVisibility(View.INVISIBLE);
              //   prueba.setText("FIN");
-                emailUsuario.setFocusable(true);
+               // emailUsuario.setFocusable(true);
                 emailUsuario.setEnabled(true);
                 emailUsuario.setCursorVisible(true);
 
-                passwordUsuario.setFocusable(true);
+               // passwordUsuario.setFocusable(true);
                 passwordUsuario.setEnabled(true);
                 passwordUsuario.setCursorVisible(true);
 

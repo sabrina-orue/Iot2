@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 
 import com.example.algeiba.iot2.UtilidadesBD.ConexionSqliteHelper;
 import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
+
+import java.sql.PreparedStatement;
 
 /**
  * Created by Algeiba on 5/26/2018.
@@ -34,49 +37,47 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
 
         }
 
-        public void onClick(View v)
-        {
+        public void onClick(View v) {
             nombreUsuario = (EditText) findViewById(R.id.nameUser);
             emailUsuario = (EditText) findViewById(R.id.emailUser);
             passwordUsuario = (EditText) findViewById(R.id.passUser);
 
             boolean robust = SeguridadUtil.RobustPassword(passwordUsuario.getText().toString());
-
-
-            if ((nombreUsuario.length() == 0) || (emailUsuario.length() == 0) || (passwordUsuario.length() == 0)) {
-                Toast.makeText(getApplicationContext(),"Faltan Completar Campos", Toast.LENGTH_SHORT).show();
-            }
-            else if(passwordUsuario.length() < 8 ){
-                passwordUsuario.setError("Contraseña demasiado corta");
-
-              //  Toast.makeText(getApplicationContext(),"Contraseña demasiado corta", Toast.LENGTH_SHORT).show();
-            }
-            else if(robust != true) {
-                passwordUsuario.setError("La cotraseña debe contener Mayuscula, minuscula y numeros");
-              //  Toast.makeText(getApplicationContext(), "La cotraseña debe contener Mayuscula, minuscula y numeros", Toast.LENGTH_SHORT).show();
-
+            if (nombreUsuario.length() > 15) {
+                nombreUsuario.setError("Nombre demaciado extenso");
             }
             else {
-                Boolean correcto= Validacion(emailUsuario.getText().toString());
-                if (correcto){
-                    registrarUsuarios();
-                }
-                else{
-                    emailUsuario.setError("Tipo de mail Icorrecto");
-                    Toast.makeText(getApplicationContext(),"Tipo de mail Icorrecto",Toast.LENGTH_SHORT).show();
+                if ((nombreUsuario.length() == 0) || (emailUsuario.length() == 0) || (passwordUsuario.length() == 0)) {
+                    Toast.makeText(getApplicationContext(), "Faltan Completar Campos", Toast.LENGTH_SHORT).show();
+                } else if (passwordUsuario.length() < 8) {
+                    passwordUsuario.setError("Contraseña demasiado corta");
 
+                    //  Toast.makeText(getApplicationContext(),"Contraseña demasiado corta", Toast.LENGTH_SHORT).show();
+                } else if (robust != true) {
+                    passwordUsuario.setError("La cotraseña debe contener Mayuscula, minuscula y numeros");
+                    //  Toast.makeText(getApplicationContext(), "La cotraseña debe contener Mayuscula, minuscula y numeros", Toast.LENGTH_SHORT).show();
+                } else {
+                    Boolean correcto = Validacion(emailUsuario.getText().toString());
+                    if (correcto) {
+                        registrarUsuarios();
+                    } else {
+                        emailUsuario.setError("Tipo de mail Icorrecto");
+                        // Toast.makeText(getApplicationContext(),"Tipo de mail Icorrecto",Toast.LENGTH_SHORT).show();
+
+                    }
+                    //registrarUsuariosPorSentencia();
                 }
-                //registrarUsuariosPorSentencia();
             }
         }
     //TODO: ver con Sabry
         private Boolean Validacion(String emailUser) {
             if (!Patterns.EMAIL_ADDRESS.matcher(emailUser).matches()) {
                 // String mensaje= String.valueOf(R.string.inalid);
-                emailUsuario.setError("Datos Icorrectos");
+                emailUsuario.setError("Email no valido");
                 return false;
             }
             else{
+
                 String consulta = value.consultaUsuario(emailUser);
                 ConexionSqliteHelper conexion=new ConexionSqliteHelper(this);
                 SQLiteDatabase DB= conexion.getWritableDatabase();
@@ -102,6 +103,16 @@ import com.example.algeiba.iot2.UtilidadesBD.UtilidadUsuario;
                 SQLiteDatabase DB= conexion.getWritableDatabase();
 
                 //inserta lo que haya en @ContentValues.usuario
+               // SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+//Fixme: mejorar las querys utilizando SQLiteStatement
+                //SQLiteStatement stmt = DB.compileStatement("INSERT INTO Usuarios(email,nombre,password,intentos) VALUES (?,?,?,0)");
+                //stmt.bindString(1, emailUsuario.getText().toString());
+                //stmt.bindString(2, nombreUsuario.getText().toString());
+                //stmt.bindString(3, passwordUsuario.getText().toString());
+                //stmt.execute();
+
+
                 String insertUsuario= value.insertUsuario();
                 DB.execSQL(insertUsuario);
                 DB.close();

@@ -45,7 +45,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Nombre"
-                android:textAlignment="textStart" />
+                android:textAlignment="textStart"
+               />
 
             <EditText
                 android:id="@+id/nameUser"
@@ -53,7 +54,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="textPersonName" />
+                android:inputType="textPersonName"
+                android:digits="abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQESTUVWXZ1234567890 "
+                />
 
         </LinearLayout>
 
@@ -77,7 +80,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:ems="10"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:digits="abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQESTUVWXZ1234567890@_-. "/>
         </LinearLayout>
 
         <LinearLayout

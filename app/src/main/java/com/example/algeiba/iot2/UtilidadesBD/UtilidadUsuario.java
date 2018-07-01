@@ -17,6 +17,7 @@ public class UtilidadUsuario {
     public static final String Campo_Nombre="nombre";
     public static final String Campo_Password="password";
     private static final String Campo_Intentos = "intentos";
+
     public static final String Create_Tabla_Usuarios="Create table if not exists "+Tabla_Usuario+
             " ("+Campo_Id+" integer primary key autoincrement not null,"
             +Campo_Email+" varchar not null,"+
